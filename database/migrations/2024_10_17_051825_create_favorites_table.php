@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedbigInteger('user_id');
-            $table->string('file_link');
-            $table->integer('file_extension'); //take note of this
-            $table->text('project_desc');
-            $table->string('file_thumbnail');
-            $table->timestamps();
-
+        Schema::create('favorites', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id'); //primary key
+            $table->unsignedBigInteger('project_id'); //primary key
+            $table->timestamp('created_at');
+            
+            $table->primary(['user_id','project_id']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('favorites');
     }
 };
