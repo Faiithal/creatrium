@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('section');
             $table->integer('course');
             $table->integer('campus');
-            $table->year('acad_year');
-            $table->string('pfp_img');
+            $table->year('academic_year');
+            $table->string('image');
             $table->integer('gender');
             $table->timestamps();
 

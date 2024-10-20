@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedbigInteger('user_id');
             $table->string('file_link');
             $table->integer('file_extension'); //take note of this
-            $table->text('project_desc');
+            $table->text('description'); //newchange
             $table->string('file_thumbnail');
             $table->timestamps();
 
