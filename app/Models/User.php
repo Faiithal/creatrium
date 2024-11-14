@@ -6,12 +6,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
+    public function profile(){
+        return $this->hasOne(related: Profile::class);
+    }
+    public function projects(){
+        return $this->hasMany(Project::class, 'user_id');
+    }
+    public function liked_projects() {
+        return $this->belongsToMany(Project::class, 'likes')->withPivot('created_at');
+    }
+    public function favorited_projects() {
+        return $this->belongsToMany(User::class,'favorites')->withPivot('created_at');
+    }
+    
+    public function commented_projects() {
+        return $this->belongsToMany(User::class,'comments')->withPivot('created_at', 'content');
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -29,8 +47,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ];
 
     /**

@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
-            $table->date('birthdate');
+            $table->date('birth_date');
             $table->string('section');
             $table->integer('course');
             $table->integer('campus');
             $table->year('academic_year');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->integer('gender');
             $table->timestamps();
 
