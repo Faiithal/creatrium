@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class LikeController extends Controller
 {
     /**
-     * Captures all user likes in a project.
+     * Retrieves the likes of all projects
      * @param \App\Models\Project $project
      * @return mixed|\Illuminate\Http\JsonResponse
      */
@@ -21,12 +21,11 @@ class LikeController extends Controller
     }
     
     /**
-     * Captures a specific user who liked the project.
+     * Captures all user likes in a project.
      * @param \App\Models\Project $project
-     * @param \App\Models\User $user
      * @return mixed|\Illuminate\Http\JsonResponse
      */
-    public function show(Project $project, User $user){
+    public function show(Project $project){
         return $this->Ok($project->user_likes, "Retrieved Likes Successfully!");
     }
 
@@ -42,10 +41,7 @@ class LikeController extends Controller
         
 
         if($project->user_likes()->find($user_id) != null){
-            return response()->json([
-                "ok" => false,
-                "message" => "User Has Already Liked the Project"
-            ], 400);
+            return $this->BadRequest(null, 'User has already Liked the project');
         }
         else{
             $user = User::find($request->user()->id);
@@ -61,7 +57,7 @@ class LikeController extends Controller
      * @param \App\Models\Project $project
      * @return mixed|\Illuminate\Http\JsonResponse
      */
-    public function remove(Request $request, Project $project){
+    public function destroy(Request $request, Project $project){
         $user = User::find($request->user()->id);
         $user->liked_projects()->detach($project);
 

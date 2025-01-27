@@ -12,11 +12,20 @@ abstract class Controller
 
     public function BadRequest($validator, $message = "Request Didn't pass the validation")
     {
+        if($validator != null){
         return response()->json([
             "ok" => false,
             "data" => $validator->errors(),
             "message" => $message
         ], 400);
+    }
+        
+    else{
+        return response()->json([
+                "ok" => false,
+                "message" => $message
+            ], 400);
+    }
     }
 
     /**

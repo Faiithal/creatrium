@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->unsignedbigInteger('user_id');
-            $table->string('file_link');
-            $table->integer('file_extension'); //take note of this
+            $table->string('name');
+            $table->string('file');
+            $table->string('file_extension'); //take note of this
             $table->text('description')->nullable(); //newchange
-            $table->string('file_thumbnail');
+            $table->string( 'file_icon')->nullable();
+            $table->boolean('visibility');
+            $table->json('thumbnails')->nullable();
+            //another column
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

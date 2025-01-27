@@ -24,11 +24,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'likes')->withPivot('created_at');
     }
     public function favorited_projects() {
-        return $this->belongsToMany(User::class,'favorites')->withPivot('created_at');
+        return $this->belongsToMany(Project::class,'favorites')->withPivot('created_at');
     }
     
     public function commented_projects() {
-        return $this->belongsToMany(User::class,'comments')->withPivot('created_at', 'content');
+        return $this->belongsToMany(project::class,'comments')->withPivot('created_at', 'content');
     }
     /**
      * The attributes that are mass assignable.
@@ -39,6 +39,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
     ];
 
     /**

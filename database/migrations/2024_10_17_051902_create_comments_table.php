@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('project_id');
             $table->string('content');
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->useCurrent();;
 
             $table->primary(['user_id','project_id']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

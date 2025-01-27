@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Auth;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,22 +22,25 @@ class AuthController extends Controller
 
         //validator is variable that will verify the contents if it follows the rules needed, it avoids the use of many if and else codes
         $validator = validator($request->all(), [
-            'name' => 'required|string|min:4|alpha_dash|unique:users|max:255',
+            'name' => 'required|string|min:
+            4|alpha_dash|unique:users|max:255',
             'password' => 'required|string|confirmed|min: 8|max: 255',
             'first_name' => 'required|string|max: 64',
-            'middle_name' => 'required|string|max: 64',
+            'middle_name' => 'sometimes|string|max: 64',
             'last_name' => 'required|string|max: 64',
+            'affix' => 'sometimes|string|max: 10',
             'birth_date' => 'required|date|before:tomorrow|after:1.1.1900',
             'section' => 'required|string|max: 64',
             'course' => 'required|integer',
             'campus' => 'required|integer',
             'academic_year' => 'required|integer|digits: 4|min: 1900|max:' . (date('Y') + 1),
             //possible question: try to find a way to make the whole academic year
-            // 'image' => 'required|string',
+            'image' => 'sometimes|image',
             //possible problem: I want this to only act when you upload an pfp image
             // solution: gawing
             'gender' => 'required|integer|min:1|max:3'
         ]);
+
 
         if ($validator->fails()) {
             return $this->BadRequest($validator);
@@ -44,7 +48,6 @@ class AuthController extends Controller
         }
 
         $validator->validated();
-
         $user = User::create($validator->safe()->only('name', 'password'));
 
 
@@ -111,9 +114,12 @@ class AuthController extends Controller
         $user->profile;
 
         return $this->Ok($user, "Valid Token");
-
-
     }
     // Check Token
 
+    public function logout(Request $request){
+        $request->user()->token()->revoke();
+
+        return $this->Ok("", "Successfully Logged out");
+    }
 }
