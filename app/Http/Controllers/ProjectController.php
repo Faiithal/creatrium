@@ -127,11 +127,11 @@ class ProjectController extends Controller
         }
 
         $validator = validator($request->all(), [
-            "name" => "required|string|max:255",
+            "name" => "sometimes|string|max:255",
             "file" => "sometimes|file",
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
-            "visibility" => "required|boolean",
+            "visibility" => "sometimes|boolean",
             "thumbnails" => "sometimes|array",
             "thumbnails.*" => "image"
         ]);
@@ -141,31 +141,37 @@ class ProjectController extends Controller
         }
 
         $validated = $validator->validated();
-        $validated['file_extension'] = $request->file('file')->getClientOriginalExtension();
-
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
 
-        $projectPath = $request->file('file')->storeas('uploads', $baseUserProjectPath . "." . $project->file_extension, 'public');
+        if(isset($validated['file'])){            
+            $validated['file_extension'] = $request->file('file')->extension();
+            $projectPath = $request->file('file')->storeas('uploads', $baseUserProjectPath . "." . $project->file_extension, 'public');
         $validated['file'] = $projectPath;
 
+        }
+
+
         if (isset($validated['file_icon'])) {
+            Storage::disk('public')->delete($project->file);
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
             $validated['file_icon'] = $IconPath;
         }
 
         if(isset($validated['thumbnails'])){
             $thumbnail_count = 0;
+            $thumbss = json_decode($project->thumbnails, true);
+            Storage::disk('public')->delete($thumbss);
             foreach ($request->file('thumbnails') as $thumbnail) {
-                $ThumbnailPath = $thumbnail->storeAs('uploads', $baseUserProjectPath . "-thumbnail-" . $thumbnail_count . '.' . $request->file('file_icon')->extension(), 'public');
+                $ThumbnailPath = $thumbnail->storeAs('uploads', $baseUserProjectPath . "-thumbnail-" . $thumbnail_count . '.' . $thumbnail->extension(), 'public');
                 $thumbnails[] = $ThumbnailPath;
                 $thumbnail_count++;
             }
             
-            $validated["thumbnails"] = json_encode($thumbnails);
+            $validated['thumbnails'] = json_encode($thumbnails);
         }
 
         // Use Case: when there is no other instance of the project, this also serves as a one step process of a 2 step process
-        $project->update($validator->validated());
+        $project->update($validated);
         // $project = $project->create($validated); - two step
         // Project $project = $project->create($validated); - two step as it you assign an object first to the variable then create an instance 
         return $this->Ok($project, "Project has been updated");
@@ -182,7 +188,15 @@ class ProjectController extends Controller
             return $this->Unauthorized();
         }
         $project->delete();
-
+        Storage::disk('public')->delete($project->file);
+        if(isset($project->file_icon)){
+            Storage::disk('public')->delete($project->file_icon);
+        }
+        if(isset($project->thumbnails)){
+            foreach(json_decode($project->thumbnails) as $thumbnail){
+                Storage::disk('public')->delete($thumbnail);
+            }
+        }
         return $this->Ok($project, "The Project has successfully been deleted!");
     }
 }
