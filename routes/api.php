@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ViewHistoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,6 @@ route::prefix("/projects")->group(
     }
 );
 
-
 // LikeController
 
 route::prefix("/likes")->group(
@@ -68,3 +68,13 @@ route::prefix("/favorites")->group(
         route::delete("/{project}", action: [FavoriteController::class, 'destroy'])->middleware('auth:api');
     }
 );
+
+// ViewHistoryController
+
+route::prefix('/history')->group(
+    function() {
+        route::get('/', [ViewHistoryController::class, 'index'])->middleware('auth:api');
+        route::post('/{project}', [ViewHistoryController::class, 'store'])->middleware('auth:api');
+    }
+);
+

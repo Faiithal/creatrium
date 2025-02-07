@@ -36,6 +36,9 @@ class LikeController extends Controller
      * @return mixed|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request, Project $project){
+        if(!isset($request->user()->id)){
+            return $this->Unauthorized();
+        }
 
         $user_id = $request->user()->id;
         
@@ -58,6 +61,9 @@ class LikeController extends Controller
      * @return mixed|\Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, Project $project){
+        if(!isset($request->user()->id)){
+            return $this->Unauthorized();
+        }
         $user = User::find($request->user()->id);
         $user->liked_projects()->detach($project);
 

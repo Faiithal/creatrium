@@ -23,6 +23,14 @@ class Project extends Model
         return $this->belongsToMany(User::class,'comments')->withPivot('created_at', 'content');
     }
 
+    public function user_views(){
+        return $this->belongsToMany(User::class, 'view-history')->withPivot('created_at');
+    }
+    
+    public function categories(){
+        return $this->belongsToMany(Category::class, 'category_project');
+    }
+    
     protected $guarded = [];
 
 }
