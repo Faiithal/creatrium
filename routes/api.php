@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\authcontroller;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FavoriteController;
@@ -78,3 +79,8 @@ route::prefix('/history')->group(
     }
 );
 
+route::prefix('categories')->group(
+    function(){
+        route::get('/', [CategoryController::class, 'index']);
+    }
+);

@@ -32,7 +32,7 @@ class ProjectController extends Controller
 
         $validator = validator($request->all(), [
             "name" => "required|string|max:255",
-            "file" => "required|file",
+            "file" => "required|file|mimes:pdf",
             "web_link" => "sometimes|link",
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
@@ -53,11 +53,13 @@ class ProjectController extends Controller
         $validated['user_id'] = $request->user()->id;
         $validated['file_extension'] = $request->file('file')->extension();
         $validated['thumbnails'] = json_encode($request->file('thumbnails'));
-        $validated['authors'] = json_encode($request->file('authors'));
+        $validated['authors'] = json_encode($validated['authors']);
         // Creates the project which will then be used to grab its id for the location of the project
         $project = Project::create($validated);
         $project_categories = $validator->safe()->only('categories');
-        $project->categories()->attach($project_categories["categories"]);
+        if ($project_categories) {
+            $project->categories()->sync($project_categories["categories"]);
+        }
         // Path names
 
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
@@ -142,7 +144,7 @@ class ProjectController extends Controller
 
         $validator = validator($request->all(), [
             "name" => "sometimes|string|max:255",
-            "file" => "sometimes|file",
+            "file" => "sometimes|file|mimes:pdf",
             // Just check if file is null and check web_link
             "web_link" => "sometimes|link",
             "authors" => "sometimes|array",
@@ -157,11 +159,18 @@ class ProjectController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->BadRequest($validator);
+            return $this->BadRequest(validator: $validator);
         }
 
-        $validated = $validator->validated();
+        $validated = $validator->safe()->except('categories');
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
+
+        $project_categories = $validator->safe()->only('categories');
+        if ($project_categories) {
+            $project->categories()->sync($project_categories["categories"]);
+        }
+
+        $validated['authors'] = json_encode($validated['authors']);
 
         if (isset($validated['file'])) {
             $validated['file_extension'] = $request->file('file')->extension();
