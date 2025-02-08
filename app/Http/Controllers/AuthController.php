@@ -12,6 +12,7 @@ class AuthController extends Controller
 {
 
     // Register
+    // Add Toast
     /**
      * Creates User and Profile Data
      * @param Request

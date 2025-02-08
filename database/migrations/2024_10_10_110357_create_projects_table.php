@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedbigInteger('user_id');
             $table->string('name');
+            $table->json('authors');
             $table->string('file');
             $table->string('file_extension'); //take note of this
             $table->text('description')->nullable(); //newchange

@@ -15,7 +15,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return $this->Ok(Project::all(), "Projects have been retrieved");
+        return $this->Ok(Project::with('categories')->get(), "Projects have been retrieved");
     }
 
     /**
@@ -33,8 +33,11 @@ class ProjectController extends Controller
         $validator = validator($request->all(), [
             "name" => "required|string|max:255",
             "file" => "required|file",
+            "web_link" => "sometimes|link",
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
+            "authors" => "required|array",
+            "authors.*" => "string",
             "visibility" => "required|boolean",
             "thumbnails" => "sometimes|array",
             "thumbnails.*" => "image",
@@ -50,6 +53,7 @@ class ProjectController extends Controller
         $validated['user_id'] = $request->user()->id;
         $validated['file_extension'] = $request->file('file')->extension();
         $validated['thumbnails'] = json_encode($request->file('thumbnails'));
+        $validated['authors'] = json_encode($request->file('authors'));
         // Creates the project which will then be used to grab its id for the location of the project
         $project = Project::create($validated);
         $project_categories = $validator->safe()->only('categories');
@@ -84,7 +88,7 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        return $this->Created($project->categories(), "Project has been updated");
+        return $this->Created($project->with('categories')->find($project->id), "Project has been updated");
     }
 
     /**
@@ -92,9 +96,10 @@ class ProjectController extends Controller
      * @param \App\Models\Project $project
      * @return mixed|\Illuminate\Http\JsonResponse
      */
-    public function show(Project $project)
+    public function show($project)
     {
-        return $this->Ok($project, "Project has been retrieved!");
+        // Find out why pivot does not work
+        return $this->Ok(Project::with('categories')->find($project), "Project has been retrieved!");
     }
 
     /**
@@ -140,11 +145,15 @@ class ProjectController extends Controller
             "file" => "sometimes|file",
             // Just check if file is null and check web_link
             "web_link" => "sometimes|link",
+            "authors" => "sometimes|array",
+            "authors.*" => "string",
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
             "visibility" => "sometimes|boolean",
             "thumbnails" => "sometimes|array",
-            "thumbnails.*" => "image"
+            "thumbnails.*" => "image",
+            "categories" => "sometimes|array",
+            "categories.*" => "integer|exists:categories,id",
         ]);
 
         if ($validator->fails()) {
