@@ -34,6 +34,10 @@ class User extends Authenticatable
     public function viewed_projects() {
         return $this->belongsToMany(project::class,'view_history')->withPivot('created_at');
     }
+
+    public function course() {
+        return $this->belongsToMany(Course::class);
+    }
     /**
      * The attributes that are mass assignable.
      *

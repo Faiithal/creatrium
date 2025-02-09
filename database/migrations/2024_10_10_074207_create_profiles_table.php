@@ -19,8 +19,7 @@ return new class extends Migration
             $table->string('affix')->nullable();
             $table->date('birth_date');
             $table->string('section');
-            $table->integer('course');
-            $table->integer('campus');
+            $table->enum('campus', ['Pasig', 'Pasay', 'Jala-Jala']);
             $table->year('academic_year');
             $table->string('image')->nullable();
             $table->integer('gender');

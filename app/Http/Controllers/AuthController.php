@@ -7,6 +7,7 @@ use Auth;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -33,10 +34,9 @@ class AuthController extends Controller
             'birth_date' => 'required|date|before:tomorrow|after:1.1.1900',
             'section' => 'required|string|max: 64',
             'course' => 'required|integer',
-            'campus' => 'required|integer',
+            'campus' => 'required', Rule::in(['Pasig', 'Pasay', 'Jala-Jala']),
             'academic_year' => 'required|integer|digits: 4|min: 1900|max:' . (date('Y') + 1),
             //possible question: try to find a way to make the whole academic year
-            'image' => 'sometimes|image',
             //possible problem: I want this to only act when you upload an pfp image
             // solution: gawing
             'gender' => 'required|integer|min:1|max:3'
@@ -59,7 +59,8 @@ class AuthController extends Controller
         ])
         */
 
-        $user->profile()->create($validator->safe()->except('name', 'password'));
+        $user->profile()->create($validator->safe()->except('name', 'password', 'course'));
+        $user->course()->attach($validator->safe()->only('course')['course']);
 
         return $this->Created($user);
     }
