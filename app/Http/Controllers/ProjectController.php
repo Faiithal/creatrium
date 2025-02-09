@@ -6,6 +6,7 @@ use App\Models\Project;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Log;
 
 class ProjectController extends Controller
@@ -33,14 +34,15 @@ class ProjectController extends Controller
         $validator = validator($request->all(), [
             "name" => "required|string|max:255",
             // This code may add an additional unnecessary source if you provide 2
-            "file" => "required_without:web_link|file|mimes:pdf",
-            "web_link" => "required_without:file|url",
+            "type" => ["required", Rule::in(['pdf', 'web', 'img'])],
+            "file" => "required_if:type,pdf|file|mimes:pdf",
+            "web_link" => "required_if:type,web|url",
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
             "authors" => "required|array",
             "authors.*" => "string",
             "visibility" => "required|boolean",
-            "thumbnails" => "sometimes|array",
+            "thumbnails" => "sometimes|array|max:5",
             "thumbnails.*" => "image",
             "categories" => "sometimes|array",
             "categories.*" => "integer|exists:categories,id"
@@ -50,12 +52,14 @@ class ProjectController extends Controller
             return $this->BadRequest($validator);
         }
 
-        $validated = $validator->safe()->except('categories', 'web_link');
-        $web_link = $validator->safe()->only('web_link');
+        $validated = $validator->safe()->except('categories', 'web_link', 'type');
+        $web_link = $request->input('web_link');
+        $type = $request->input('type');
 
         $validated['user_id'] = $request->user()->id;
         $validated['thumbnails'] = json_encode($request->file('thumbnails'));
         $validated['authors'] = json_encode($validated['authors']);
+
         // Temporary Solution HAHAHAHAH
         $validated['file'] = '';
         $validated['file_extension'] = '';
@@ -63,24 +67,30 @@ class ProjectController extends Controller
         // Creates the project which will then be used to grab its id for the location of the project
         $project = Project::create($validated);
 
-        $project_categories = $validator->safe()->only('categories');
+        $project_categories = $request->input('categories');
         if ($project_categories) {
-            $project->categories()->sync($project_categories["categories"]);
+            $project->categories()->sync($project_categories);
         }
+
+
         // Path names
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
 
-        if ($web_link) {
-            $validated['file_extension'] = '';
-            $validated['file'] = $web_link['web_link'];
-            // There's a better way to this thing
-        } else {
-            $validated['file_extension'] = $request->file('file')->extension();
-            // dd($request->file('file'));
-            $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $validated['file_extension'], 'public');
-            $validated['file'] = $projectPath;
+        switch ($type) {
+            case 'pdf':
+                $validated['file_extension'] = $request->file('file')->extension();
+                // dd($request->file('file'));
+                $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $validated['file_extension'], 'public');
+                $validated['file'] = $projectPath;
+                break;
+            case 'web':
+                $validated['file_extension'] = '';
+                $validated['file'] = $web_link;
+                break;
+            case 'img':
+                // Do nothing as it's already blank at line 64
+                break;
         }
-
 
         if (isset($validated['file_icon'])) {
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
@@ -157,6 +167,7 @@ class ProjectController extends Controller
         }
 
         $validator = validator($request->all(), [
+            "type" => ["required", Rule::in(['pdf', 'web', 'img'])],
             "name" => "sometimes|string|max:255",
             "file" => "sometimes|file|mimes:pdf",
             // Just check if file is null and check web_link
@@ -166,7 +177,7 @@ class ProjectController extends Controller
             "description" => "sometimes|string",
             "file_icon" => "sometimes|image|mimes:jpg,bmp,png",
             "visibility" => "sometimes|boolean",
-            "thumbnails" => "sometimes|array",
+            "thumbnails" => "sometimes|array|max:5",
             "thumbnails.*" => "image",
             "categories" => "sometimes|array",
             "categories.*" => "integer|exists:categories,id",
@@ -176,37 +187,69 @@ class ProjectController extends Controller
             return $this->BadRequest(validator: $validator);
         }
 
-        $validated = $validator->safe()->except('categories', 'web_link');
-        $web_link = $validator->safe()->only('web_link');
+        $validated = $validator->safe()->except('categories', 'web_link', 'type');
+        $web_link = $request->input('web_link');
+        $type = $request->input('type');
 
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
 
-        $project_categories = $validator->safe()->only('categories');
+        $project_categories = $request->input('categories');
         if ($project_categories) {
-            $project->categories()->sync($project_categories["categories"]);
+            $project->categories()->sync($project_categories);
         }
 
         $validated['authors'] = json_encode($validated['authors']);
 
-        if ($web_link) {
-            if ($project->file_extension)
-                Storage::disk('public')->delete($project->file);
+        switch ($type) {
+            case 'pdf':
+                if ($request->hasFile('file')) {
+                    if (!$project->file_extension)
+                        $validated['file_extension'] = $request->file(key: 'file')->extension();
 
-            $validated['file_extension'] = '';
-            // There's a better way to this thing
-            $validated['file'] = $web_link['web_link'];
-        } else {
-            if ($request->hasFile('file')) {
-                if (!$project->file_extension)
-                    $validated['file_extension'] = $request->file(key: 'file')->extension();
+                    $file_extension = $project->file_extension ? $project->file_extension : $validated['file_extension'];
 
-                $file_extension = $project->file_extension ? $project->file_extension : $validated['file_extension'];
+                    Storage::disk('public')->delete($project->file);
+                    $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $file_extension, 'public');
+                    $validated['file'] = $projectPath;
+                } 
+                else if(!$project->file_extension){
+                    return $this->BadRequest(null, 'A PDF file is required when changing project types!');
+                }
+                break;
 
-                Storage::disk('public')->delete($project->file);
-                $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $file_extension, 'public');
-                $validated['file'] = $projectPath;
-            }
+            case 'web':
+                
+                if ($project->file_extension) {
+                    if ($web_link) {
+                        Storage::disk('public')->delete($project->file);
+
+                        $validated['file_extension'] = '';
+                        $validated['file'] = $web_link;
+                    } else {
+                        return $this->BadRequest(null, 'Website Link is required when changing project types!');
+                    }
+                } else {
+                    unset($validated['file']);
+                    if ($web_link)
+                        $validated['file'] = $web_link;
+                }
+                break;
+
+            case 'img':
+                if ($project->file_extension) {
+                    Storage::disk('public')->delete($project->file);
+                    $validated['file_extension'] = '';
+                    $validated['file'] = '';
+
+                } else {
+                    unset($validated['file']);
+                    $validated['file'] = '';
+                }
+                break;
+
         }
+
+        // dd($validated['file']);
 
         if (isset($validated['file_icon'])) {
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
