@@ -72,12 +72,12 @@ class ProjectController extends Controller
 
         if ($web_link) {
             $validated['file_extension'] = '';
-            $validated['file'] = $web_link['web_link']; 
+            $validated['file'] = $web_link['web_link'];
             // There's a better way to this thing
         } else {
             $validated['file_extension'] = $request->file('file')->extension();
             // dd($request->file('file'));
-            $projectPath = $request->file('file')->storeas('uploads', $baseUserProjectPath . "." . $validated['file_extension'], 'public');
+            $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $validated['file_extension'], 'public');
             $validated['file'] = $projectPath;
         }
 
@@ -160,7 +160,7 @@ class ProjectController extends Controller
             "name" => "sometimes|string|max:255",
             "file" => "sometimes|file|mimes:pdf",
             // Just check if file is null and check web_link
-            "web_link" => "sometimes|link",
+            "web_link" => "sometimes|url",
             "authors" => "sometimes|array",
             "authors.*" => "string",
             "description" => "sometimes|string",
@@ -176,7 +176,9 @@ class ProjectController extends Controller
             return $this->BadRequest(validator: $validator);
         }
 
-        $validated = $validator->safe()->except('categories');
+        $validated = $validator->safe()->except('categories', 'web_link');
+        $web_link = $validator->safe()->only('web_link');
+
         $baseUserProjectPath = $project->user_id . '-' . $project->id;
 
         $project_categories = $validator->safe()->only('categories');
@@ -186,15 +188,27 @@ class ProjectController extends Controller
 
         $validated['authors'] = json_encode($validated['authors']);
 
-        if (isset($validated['file'])) {
-            $validated['file_extension'] = $request->file('file')->extension();
-            $projectPath = $request->file('file')->storeas('uploads', $baseUserProjectPath . "." . $project->file_extension, 'public');
-            $validated['file'] = $projectPath;
+        if ($web_link) {
+            if ($project->file_extension)
+                Storage::disk('public')->delete($project->file);
+
+            $validated['file_extension'] = '';
+            // There's a better way to this thing
+            $validated['file'] = $web_link['web_link'];
+        } else {
+            if ($request->hasFile('file')) {
+                if (!$project->file_extension)
+                    $validated['file_extension'] = $request->file(key: 'file')->extension();
+
+                $file_extension = $project->file_extension ? $project->file_extension : $validated['file_extension'];
+
+                Storage::disk('public')->delete($project->file);
+                $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $file_extension, 'public');
+                $validated['file'] = $projectPath;
+            }
         }
 
-
         if (isset($validated['file_icon'])) {
-            Storage::disk('public')->delete($project->file);
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
             $validated['file_icon'] = $IconPath;
         }
