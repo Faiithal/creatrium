@@ -14,28 +14,36 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(related: Profile::class);
     }
-    public function projects(){
+    public function projects()
+    {
         return $this->hasMany(Project::class, 'user_id');
     }
-    public function liked_projects() {
+    public function liked_projects()
+    {
         return $this->belongsToMany(Project::class, 'likes')->withPivot('created_at');
     }
-    public function favorited_projects() {
-        return $this->belongsToMany(Project::class,'favorites')->withPivot('created_at');
-    }
-    
-    public function commented_projects() {
-        return $this->belongsToMany(project::class,'comments')->withPivot('created_at', 'content');
-    }
-    
-    public function viewed_projects() {
-        return $this->belongsToMany(project::class,'view_history')->withPivot('created_at');
+    public function favorited_projects()
+    {
+        return $this->belongsToMany(Project::class, 'favorites')->withPivot('created_at');
     }
 
-    public function course() {
+    public function commented_projects()
+    {
+        return $this->belongsToMany(project::class, 'comments')->withPivot('created_at', 'content');
+    }
+
+    public function viewed_projects()
+    {
+        return $this->belongsToMany(project::class, 'view_history')->withPivot('created_at')
+            ->orderByPivot('created_at', 'desc');
+    }
+
+    public function course()
+    {
         return $this->belongsToMany(Course::class);
     }
     /**

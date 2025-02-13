@@ -102,7 +102,7 @@ class AuthController extends Controller
 
         $user = auth()->user();
         $user->profile;
-
+        
         $token = $user->createToken("api")->accessToken;
 
         return $this->Ok([
