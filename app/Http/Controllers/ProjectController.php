@@ -19,6 +19,19 @@ class ProjectController extends Controller
         return $this->Ok(Project::with('categories')->get(), "Projects have been retrieved");
     }
 
+    public function sortByLikes()
+    {
+        return $this->Ok(array_values(Project::withCount('user_likes')->get()->sortByDesc('user_likes')->toArray()));
+    }
+    public function sortByFavorites()
+    {
+        return $this->Ok(array_values(Project::withCount('user_favorites')->get()->sortByDesc('user_favorites')->toArray()));
+    }
+    public function sortByRecent()
+    {
+        return $this->Ok(array_values(Project::all()->sortByDesc('created_at')->toArray()));
+    }
+
     /**
      * Store a newly created resource in storage.
      * @param \Illuminate\Http\Request $request
@@ -92,12 +105,12 @@ class ProjectController extends Controller
                 break;
         }
 
-        if (isset($validated['file_icon'])) {
+        if ($request->hasFile('file_icon')) {
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
             $validated['file_icon'] = $IconPath;
         }
 
-        if (isset($validated['thumbnails'])) {
+        if ($request->hasFile('thumbnails')) {
             $thumbnail_count = 0;
             foreach ($request->file('thumbnails') as $thumbnail) {
                 $ThumbnailPath = $thumbnail->storeAs('uploads', $baseUserProjectPath . "-thumbnail-" . $thumbnail_count . '.' . $thumbnail->extension(), 'public');
@@ -124,6 +137,15 @@ class ProjectController extends Controller
      */
     public function show($project)
     {
+        $validator = validator([
+            'id' => $project
+        ], [
+            'id' => 'exists:projects,id'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->BadRequest($validator);
+        }
         // Find out why pivot does not work
         return $this->Ok(Project::with('categories')->find($project), "Project has been retrieved!");
     }
@@ -184,7 +206,8 @@ class ProjectController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->BadRequest(validator: $validator);
+            return $this->BadRequest($validator);
+
         }
 
         $validated = $validator->safe()->except('categories', 'web_link', 'type');
@@ -198,7 +221,9 @@ class ProjectController extends Controller
             $project->categories()->sync($project_categories);
         }
 
-        $validated['authors'] = json_encode($validated['authors']);
+        if ($validated['authors']) {
+            $validated['authors'] = json_encode($validated['authors']);
+        }
 
         switch ($type) {
             case 'pdf':
@@ -211,14 +236,13 @@ class ProjectController extends Controller
                     Storage::disk('public')->delete($project->file);
                     $projectPath = $request->file('file')->storeAs('uploads', $baseUserProjectPath . "." . $file_extension, 'public');
                     $validated['file'] = $projectPath;
-                } 
-                else if(!$project->file_extension){
+                } else if (!$project->file_extension) {
                     return $this->BadRequest(null, 'A PDF file is required when changing project types!');
                 }
                 break;
 
             case 'web':
-                
+
                 if ($project->file_extension) {
                     if ($web_link) {
                         Storage::disk('public')->delete($project->file);
@@ -251,12 +275,13 @@ class ProjectController extends Controller
 
         // dd($validated['file']);
 
-        if (isset($validated['file_icon'])) {
+        if ($request->hasFile('file_icon')) {
+            Storage::disk('public')->delete($project->file_icon);
             $IconPath = $request->file('file_icon')->storeAs('uploads', $baseUserProjectPath . "-icon" . '.' . $request->file('file_icon')->extension(), 'public');
             $validated['file_icon'] = $IconPath;
         }
 
-        if (isset($validated['thumbnails'])) {
+        if ($request->hasFile('thumbnails')) {
             $thumbnail_count = 0;
             $thumbss = json_decode($project->thumbnails, true);
             Storage::disk('public')->delete($thumbss);
@@ -298,4 +323,6 @@ class ProjectController extends Controller
         }
         return $this->Ok($project, "The Project has successfully been deleted!");
     }
+
+
 }

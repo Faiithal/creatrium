@@ -11,14 +11,13 @@ class ViewHistoryController extends Controller
 
     public function index(Request $request)
     {
-        if (!isset($request->user)) {
+        if (!isset($request->user()->id)) {
             return $this->Unauthorized();
         }
         // I think this will not work but lets see
         // update: that did not work HAHAHAHA
-        // return $this->Ok($request->user()->viewed_projects); 
-        $user = User::find($request->user()->id);
-        return $this->Ok($user->viewed_projects);
+        // return $this->Ok($request->user()->viewed_projects); ;
+        return $this->Ok(request()->user()->viewed_projects);
     }
 
     public function store(Request $request, Project $project)
@@ -26,7 +25,7 @@ class ViewHistoryController extends Controller
         /* The reason why we do this is that we want to get the account id of the current
             user logged in instead of using grabbing the user 
         */
-        if (!isset($request->user)) {
+        if (!isset($request->user()->id)) {
             return $this->Unauthorized();
         }
         $user = User::find($request->user()->id);

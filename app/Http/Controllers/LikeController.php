@@ -29,6 +29,14 @@ class LikeController extends Controller
         return $this->Ok($project->user_likes, "Retrieved Likes Successfully!");
     }
 
+    public function checkLike(Request $request, Project $project){
+        if(!isset($request->user()->id)){
+            return $this->Unauthorized();
+        }
+
+        return $this->Ok($request->user()->liked_projects()->find($project));
+    }
+
     /**
      * Adds the user's like to the project
      * @param \Illuminate\Http\Request $request

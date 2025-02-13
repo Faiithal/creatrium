@@ -14,8 +14,7 @@ class ProfilesController extends Controller
     }
 
     public function show(User $user){
-        $profile = $user->profile;
-        return $this->Ok($profile, 'Retrieve profile successfully!');
+        return $this->Ok(['user' => $user, 'profile' => $user->profile], 'Retrieve profile successfully!');
     }
 
     public function update(Request $request){
@@ -54,5 +53,9 @@ class ProfilesController extends Controller
         $user->course()->sync($validator->safe()->only('course'));
 
         return $this->Ok(User::with('profile', 'course')->find($user->id));
+    }
+
+    public function getProjects(User $user){
+        return $this->Ok($user->projects);
     }
 }

@@ -18,6 +18,14 @@ class FavoriteController extends Controller
         return $this->Ok($user->favorited_projects);
     }
 
+    public function checkFavorite(Request $request, Project $project){
+        if(!isset($request->user()->id)){
+            return $this->Unauthorized();
+        }
+
+        return $this->Ok($request->user()->favorited_projects()->find($project));
+    }
+
     // public function checkUserFavorites(Request $request)
     // {
     //     if (!isset($request->user()->id)) {

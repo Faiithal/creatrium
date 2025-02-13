@@ -9,6 +9,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfilesController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewHistoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,13 +34,15 @@ route::prefix("/projects")->group(
         route::post("/", [ProjectController::class, 'store'])->middleware("auth:api");
         //{[id]} -> Specifies what id the function will perform it on
         route::get("/search", [ProjectController::class, 'search']);
+        route::get("/top-rated", [ProjectController::class, 'sortByLikes']);
+        route::get("/popular", [ProjectController::class, 'sortByFavorites']);
+        route::get("/recent", [ProjectController::class, 'sortByRecent']);
         route::get("/{project}", [ProjectController::class, 'show']);
         route::delete("/{project}", [ProjectController::class, 'destroy'])->middleware("auth:api"); // Question: So as long you have that certain key, does it also 
         route::patch("/{project}", [ProjectController::class, 'update'])->middleware("auth:api");
         //Note: when using the update function, instead of specifying patch in postman, just make it a post request and
         //add the method "?_method=PATCH" because php doesnt have a concept of patch in their documentation
         //Also do note that the value that you will put there will serve as a variable that will be used for the function
-    
     }
 );
 
@@ -49,6 +52,7 @@ route::prefix("/likes")->group(
     function () {
         route::get("/", [LikeController::class, 'index']);
         route::get("/{project}", [LikeController::class, 'show']);
+        route::get("/check/{project}", [LikeController::class, 'checkLike'])->middleware('auth:api');
         route::post("/{project}", [LikeController::class, 'store'])->middleware('auth:api');
         route::delete("/{project}", action: [LikeController::class, 'destroy'])->middleware('auth:api');
     }
@@ -67,6 +71,7 @@ route::prefix("/favorites")->group(
     function () {
         route::get("/", [FavoriteController::class, 'index']);
         route::get("/{user}", [FavoriteController::class, 'show']);
+        route::get("/check/{project}", [FavoriteController::class, 'checkFavorite'])->middleware('auth:api');
         route::post("/{project}", [FavoriteController::class, 'store'])->middleware('auth:api');
         route::delete("/{project}", action: [FavoriteController::class, 'destroy'])->middleware('auth:api');
     }
@@ -75,7 +80,7 @@ route::prefix("/favorites")->group(
 // ViewHistoryController
 
 route::prefix('/history')->group(
-    function () {
+    function (): void {
         route::get('/', [ViewHistoryController::class, 'index'])->middleware('auth:api');
         route::post('/{project}', [ViewHistoryController::class, 'store'])->middleware('auth:api');
     }
@@ -96,7 +101,8 @@ route::prefix('courses')->group(
 route::prefix('profile')->group(
     function () {
         route::get('/', [ProfilesController::class, 'index']);
+        route::get('/{user}/projects', [ProfilesController::class, 'getProjects']);
         route::get('/{user}', [ProfilesController::class, 'show']);
-        route::post('/', action: [ProfilesController::class, 'update'])->middleware('auth:api');
+        route::post('/',  [ProfilesController::class, 'update'])->middleware('auth:api');
     }
 );
