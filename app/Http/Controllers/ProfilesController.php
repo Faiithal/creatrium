@@ -28,9 +28,9 @@ class ProfilesController extends Controller
             4|alpha_dash|unique:users|max:255',
             'password' => 'sometimes|string|confirmed|min: 8|max: 255',
             'first_name' => 'sometimes|string|max: 64',
-            'middle_name' => 'sometimes|string|max: 64',
+            'middle_name' => 'sometimes|nullable|string|max: 64',
             'last_name' => 'sometimes|string|max: 64',
-            'affix' => 'sometimes|string|max: 10',
+            'affix' => 'sometimes|nullable|string|max: 10',
             'birth_date' => 'sometimes|date|before:tomorrow|after:1.1.1900',
             'section' => 'sometimes|string|max: 64',
             'course' => 'sometimes|integer',
@@ -40,22 +40,25 @@ class ProfilesController extends Controller
             'gender' => 'sometimes|integer|min:1|max:3'
         ]);
 
+        // dd($validator->errors());
+
         if($validator->fails()){
-            return $this->BadRequest($validator->errors());
+            return $this->BadRequest(null, $validator->errors());
         }
 
         $user = $request->user(); 
         // Based on my assumptions, this does in fact work as it grabs the user model using the request method
         // and all functions pertaining to the user model still works in which you can use relationships
 
-
-        $user->profile()->update($validator->safe()->except('course'));
+        // Add an image upload function
+        $user->update($validator->safe()->only('name', 'password'));
+        $user->profile()->update($validator->safe()->except('name', 'password', 'course'));
         $user->course()->sync($validator->safe()->only('course'));
 
         return $this->Ok(User::with('profile', 'course')->find($user->id));
     }
 
     public function getProjects(User $user){
-        return $this->Ok($user->projects);
+        return $this->Ok(array_values($user->projects->sortByDesc('created_at')->toArray()));
     }
 }

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -147,7 +150,7 @@ class ProjectController extends Controller
             return $this->BadRequest($validator);
         }
         // Find out why pivot does not work
-        return $this->Ok(Project::with('categories')->find($project), "Project has been retrieved!");
+        return $this->Ok(Project::with('categories')->withCount('user_likes', 'user_favorites')->find($project), "Project has been retrieved!");
     }
 
     /**
@@ -155,18 +158,9 @@ class ProjectController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return mixed|\Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function search($search_query)
     {
-        $validator = validator(
-            $request->all(),
-            ['search_input' => 'required']
-        );
-
-        if ($validator->fails()) {
-            return $this->BadRequest($validator);
-        }
-        $validated = $validator->validated();
-        $search = explode(' ', $validated['search_input']);
+        $search = explode(' ', $search_query);
 
         $project = DB::table('projects');
         foreach ($search as $keyword) {
@@ -312,11 +306,12 @@ class ProjectController extends Controller
             return $this->Unauthorized();
         }
         $project->delete();
-        Storage::disk('public')->delete($project->file);
+        if (isset($project->file))
+            Storage::disk('public')->delete($project->file);
         if (isset($project->file_icon)) {
             Storage::disk('public')->delete($project->file_icon);
         }
-        if (isset($project->thumbnails)) {
+        if ($project->thumbnails != 'null') {
             foreach (json_decode($project->thumbnails) as $thumbnail) {
                 Storage::disk('public')->delete($thumbnail);
             }
@@ -324,5 +319,33 @@ class ProjectController extends Controller
         return $this->Ok($project, "The Project has successfully been deleted!");
     }
 
+    public function checkLikesOnList(Request $request, $user)
+    {
+        $checkProjectLike = DB::table('projects')
+        ->select('likes.user_id as like', 'likes.project_id')
+        ->join('likes', 'projects.id', '=' , 'likes.project_id')
+        ->where('likes.user_id', '=', $request->user()->id);
 
+        $checkProjectFavorite = DB::table('projects')
+        ->select('favorites.user_id as favorite', 'favorites.project_id')
+        ->join('favorites', 'projects.id', '=' , 'favorites.project_id')
+        ->where('favorites.user_id', '=', $request->user()->id);
+        
+        $projects = DB::table('users')
+        ->select('check_project_like.like', 'check_project_favorite.favorite', 'projects.*',)
+        ->join('projects', 'users.id', '=', 'projects.user_id')
+        ->leftJoinSub($checkProjectLike, 'check_project_like', function(JoinClause $join){
+            $join->on('projects.id', '=', 'check_project_like.project_id');
+        })
+        ->leftJoinSub($checkProjectFavorite, 'check_project_favorite', function(JoinClause $join){
+            $join->on('projects.id', '=', 'check_project_favorite.project_id');
+        })
+        ->where('users.id', '=', $user)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return $this->Ok(
+            $projects
+        );
+    }
 }

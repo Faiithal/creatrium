@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 route::post("/register", [Authcontroller::class, 'register']);
 route::post('/login', [Authcontroller::class, 'login']);
 route::get('/checkToken', [Authcontroller::class, 'checkToken'])->middleware("auth:api");
-route::post('/logout', [Authcontroller::class, 'logout'])->middleware("auth:api");
+route::delete('/logout', [Authcontroller::class, 'logout'])->middleware("auth:api");
 
 // For ProjectController
 route::prefix("/projects")->group(
@@ -33,7 +33,8 @@ route::prefix("/projects")->group(
         route::get("/", [ProjectController::class, 'index']);
         route::post("/", [ProjectController::class, 'store'])->middleware("auth:api");
         //{[id]} -> Specifies what id the function will perform it on
-        route::get("/search", [ProjectController::class, 'search']);
+        route::get("/search/{search_query}", [ProjectController::class, 'search']);
+        route::get("/check/{user}", [ProjectController::class, 'checkLikesOnList'])->middleware('auth:api');
         route::get("/top-rated", [ProjectController::class, 'sortByLikes']);
         route::get("/popular", [ProjectController::class, 'sortByFavorites']);
         route::get("/recent", [ProjectController::class, 'sortByRecent']);
@@ -103,6 +104,6 @@ route::prefix('profile')->group(
         route::get('/', [ProfilesController::class, 'index']);
         route::get('/{user}/projects', [ProfilesController::class, 'getProjects']);
         route::get('/{user}', [ProfilesController::class, 'show']);
-        route::post('/',  [ProfilesController::class, 'update'])->middleware('auth:api');
+        route::patch('/',  [ProfilesController::class, 'update'])->middleware('auth:api');
     }
 );
