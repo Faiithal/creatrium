@@ -1,0 +1,62 @@
+[13-Feb-2025 07:29:09 UTC] PHP Warning:  require(/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:29:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/aesirasdf/api.creatrium.space/public/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:29:11 UTC] PHP Warning:  require(/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:29:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/aesirasdf/api.creatrium.space/public/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:31:57 UTC] PHP Warning:  require(/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:31:57 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/aesirasdf/api.creatrium.space/public/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:32:05 UTC] PHP Warning:  require(/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[13-Feb-2025 07:32:05 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/aesirasdf/api.creatrium.space/public/../vendor/autoload.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/aesirasdf/api.creatrium.space/public/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/public/index.php on line 13
+[19-Feb-2025 02:42:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Illuminate\Foundation\Configuration\Middleware::pushMiddleware() in /home/aesirasdf/api.creatrium.space/bootstrap/app.php:15
+Stack trace:
+#0 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php(261): {closure}()
+#1 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1411): Illuminate\Foundation\Configuration\ApplicationBuilder->Illuminate\Foundation\Configuration\{closure}()
+#2 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1347): Illuminate\Container\Container->fireCallbackArray()
+#3 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1333): Illuminate\Container\Container->fireAfterResolvingCallbacks()
+#4 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(833): Illuminate\Container\Container->fireResolvingCallbacks()
+#5 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1046): Illuminate\Container\Container->resolve()
+#6 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(751): Illuminate\Foundation\Application->resolve()
+#7 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1028): Illuminate\Container\Container->make()
+#8 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1186): Illuminate\Foundation\Application->make()
+#9 /home/aesirasdf/api.creatrium.space/public/index.php(17): Illuminate\Foundation\Application->handleRequest()
+#10 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/bootstrap/app.php on line 15
+[19-Feb-2025 02:42:44 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Illuminate\Foundation\Configuration\Middleware::pushMiddleware() in /home/aesirasdf/api.creatrium.space/bootstrap/app.php:15
+Stack trace:
+#0 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php(261): {closure}()
+#1 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1411): Illuminate\Foundation\Configuration\ApplicationBuilder->Illuminate\Foundation\Configuration\{closure}()
+#2 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1347): Illuminate\Container\Container->fireCallbackArray()
+#3 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1333): Illuminate\Container\Container->fireAfterResolvingCallbacks()
+#4 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(833): Illuminate\Container\Container->fireResolvingCallbacks()
+#5 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1046): Illuminate\Container\Container->resolve()
+#6 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(751): Illuminate\Foundation\Application->resolve()
+#7 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1028): Illuminate\Container\Container->make()
+#8 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1186): Illuminate\Foundation\Application->make()
+#9 /home/aesirasdf/api.creatrium.space/public/index.php(17): Illuminate\Foundation\Application->handleRequest()
+#10 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/bootstrap/app.php on line 15
+[19-Feb-2025 02:44:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Illuminate\Foundation\Configuration\Middleware::pushMiddleware() in /home/aesirasdf/api.creatrium.space/bootstrap/app.php:16
+Stack trace:
+#0 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php(261): {closure}()
+#1 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1411): Illuminate\Foundation\Configuration\ApplicationBuilder->Illuminate\Foundation\Configuration\{closure}()
+#2 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1347): Illuminate\Container\Container->fireCallbackArray()
+#3 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(1333): Illuminate\Container\Container->fireAfterResolvingCallbacks()
+#4 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(833): Illuminate\Container\Container->fireResolvingCallbacks()
+#5 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1046): Illuminate\Container\Container->resolve()
+#6 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Container/Container.php(751): Illuminate\Foundation\Application->resolve()
+#7 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1028): Illuminate\Container\Container->make()
+#8 /home/aesirasdf/api.creatrium.space/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1186): Illuminate\Foundation\Application->make()
+#9 /home/aesirasdf/api.creatrium.space/public/index.php(17): Illuminate\Foundation\Application->handleRequest()
+#10 {main}
+  thrown in /home/aesirasdf/api.creatrium.space/bootstrap/app.php on line 16

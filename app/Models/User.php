@@ -33,12 +33,12 @@ class User extends Authenticatable
 
     public function commented_projects()
     {
-        return $this->belongsToMany(project::class, 'comments')->withPivot('created_at', 'content');
+        return $this->belongsToMany(Project::class, 'comments')->withPivot('created_at', 'content');
     }
 
     public function viewed_projects()
     {
-        return $this->belongsToMany(project::class, 'view_history')->withPivot('created_at')
+        return $this->belongsToMany(Project::class, 'view_history')->withPivot('created_at')
             ->orderByPivot('created_at', 'desc');
     }
 

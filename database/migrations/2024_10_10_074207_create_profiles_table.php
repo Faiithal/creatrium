@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('affix')->nullable();
-            $table->date('birth_date');
             $table->string('section');
             $table->enum('campus', ['Pasig', 'Pasay', 'Jala-Jala']);
             $table->year('academic_year');

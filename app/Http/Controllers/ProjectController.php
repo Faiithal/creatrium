@@ -19,20 +19,20 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return $this->Ok(Project::with('categories')->get(), "Projects have been retrieved");
+        return $this->Ok(Project::with('categories')->where('visibility', '=', '1')->get(), "Projects have been retrieved");
     }
 
     public function sortByLikes()
     {
-        return $this->Ok(array_values(Project::withCount('user_likes')->get()->sortByDesc('user_likes')->toArray()));
+        return $this->Ok(array_values(Project::withCount('user_likes')->where('visibility', '=', '1')->get()->sortByDesc('user_likes')->toArray()));
     }
     public function sortByFavorites()
     {
-        return $this->Ok(array_values(Project::withCount('user_favorites')->get()->sortByDesc('user_favorites')->toArray()));
+        return $this->Ok(array_values(Project::withCount('user_favorites')->where('visibility', '=', '1')->get()->sortByDesc('user_favorites')->toArray()));
     }
     public function sortByRecent()
     {
-        return $this->Ok(array_values(Project::all()->sortByDesc('created_at')->toArray()));
+        return $this->Ok(array_values(Project::all()->sortByDesc('created_at')->where('visibility', '=', '1')->toArray()));
     }
 
     /**

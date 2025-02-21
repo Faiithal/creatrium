@@ -31,7 +31,6 @@ class AuthController extends Controller
             'middle_name' => 'sometimes|string|max: 64',
             'last_name' => 'required|string|max: 64',
             'affix' => 'sometimes|string|max: 10',
-            'birth_date' => 'required|date|before:tomorrow|after:1.1.1900',
             'section' => 'required|string|max: 64',
             'course' => 'required|integer',
             'campus' => 'required', Rule::in(['Pasig', 'Pasay', 'Jala-Jala']),

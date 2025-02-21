@@ -47,7 +47,7 @@ class CommentController extends Controller
             $validated = $validator->validated();
 
             $user = User::find($request->user()->id);
-            $user->commented_projects()->attach(Project::find(1), $validated);
+            $user->commented_projects()->attach(Project::find($project), $validated);
     
             return $this->Created(($project->user_comments), 'Comment Added Successfully');
     }

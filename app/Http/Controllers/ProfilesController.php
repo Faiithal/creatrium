@@ -31,12 +31,11 @@ class ProfilesController extends Controller
             'middle_name' => 'sometimes|nullable|string|max: 64',
             'last_name' => 'sometimes|string|max: 64',
             'affix' => 'sometimes|nullable|string|max: 10',
-            'birth_date' => 'sometimes|date|before:tomorrow|after:1.1.1900',
             'section' => 'sometimes|string|max: 64',
             'course' => 'sometimes|integer',
             'campus' => ['sometimes', Rule::in(['Pasig', 'Pasay', 'Jala-Jala'])],
             'academic_year' => 'sometimes|integer|digits: 4|min: 1900|max:' . (date('Y') + 1),
-            'image' => 'sometimes|image',
+            'image' => 'sometimes|image|mimes:jpg,bmp,png',
             'gender' => 'sometimes|integer|min:1|max:3'
         ]);
 
@@ -50,9 +49,16 @@ class ProfilesController extends Controller
         // Based on my assumptions, this does in fact work as it grabs the user model using the request method
         // and all functions pertaining to the user model still works in which you can use relationships
 
+        $validated = $validator->safe()->except('name', 'password', 'course');
+
         // Add an image upload function
+        if ($request->hasFile('image')) {
+            $ProfilePath = $request->file('image')->storeAs('uploads', $user->id . "-profile" . '.' . $request->file('image')->extension(), 'public');
+            $validated['image'] = $ProfilePath;
+        }
+        
         $user->update($validator->safe()->only('name', 'password'));
-        $user->profile()->update($validator->safe()->except('name', 'password', 'course'));
+        $user->profile()->update($validated);
         $user->course()->sync($validator->safe()->only('course'));
 
         return $this->Ok(User::with('profile', 'course')->find($user->id));

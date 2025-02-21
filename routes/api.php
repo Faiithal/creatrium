@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\authcontroller;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Controller;
@@ -22,10 +22,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // For AuthController
-route::post("/register", [Authcontroller::class, 'register']);
-route::post('/login', [Authcontroller::class, 'login']);
-route::get('/checkToken', [Authcontroller::class, 'checkToken'])->middleware("auth:api");
-route::delete('/logout', [Authcontroller::class, 'logout'])->middleware("auth:api");
+route::post("/register", [AuthController::class, 'register']);
+route::post('/login', [AuthController::class, 'login']);
+route::get('/checkToken', [AuthController::class, 'checkToken'])->middleware("auth:api");
+route::delete('/logout', [AuthController::class, 'logout'])->middleware("auth:api");
 
 // For ProjectController
 route::prefix("/projects")->group(
@@ -55,7 +55,7 @@ route::prefix("/likes")->group(
         route::get("/{project}", [LikeController::class, 'show']);
         route::get("/check/{project}", [LikeController::class, 'checkLike'])->middleware('auth:api');
         route::post("/{project}", [LikeController::class, 'store'])->middleware('auth:api');
-        route::delete("/{project}", action: [LikeController::class, 'destroy'])->middleware('auth:api');
+        route::delete("/{project}", [LikeController::class, 'destroy'])->middleware('auth:api');
     }
 );
 
@@ -64,7 +64,7 @@ route::prefix("/comments")->group(
         route::get("/", [CommentController::class, 'index']);
         route::get("/{project}", [CommentController::class, 'show']);
         route::post("/{project}", [CommentController::class, 'store'])->middleware('auth:api');
-        route::delete("/{project}", action: [CommentController::class, 'destroy'])->middleware('auth:api');
+        route::delete("/{project}", [CommentController::class, 'destroy'])->middleware('auth:api');
     }
 );
 
@@ -74,7 +74,7 @@ route::prefix("/favorites")->group(
         route::get("/{user}", [FavoriteController::class, 'show']);
         route::get("/check/{project}", [FavoriteController::class, 'checkFavorite'])->middleware('auth:api');
         route::post("/{project}", [FavoriteController::class, 'store'])->middleware('auth:api');
-        route::delete("/{project}", action: [FavoriteController::class, 'destroy'])->middleware('auth:api');
+        route::delete("/{project}", [FavoriteController::class, 'destroy'])->middleware('auth:api');
     }
 );
 
@@ -99,11 +99,10 @@ route::prefix('courses')->group(
     }
 );
 
-route::prefix('profile')->group(
+route::prefix('/profile')->group(
     function () {
-        route::get('/', [ProfilesController::class, 'index']);
         route::get('/{user}/projects', [ProfilesController::class, 'getProjects']);
         route::get('/{user}', [ProfilesController::class, 'show']);
-        route::patch('/',  [ProfilesController::class, 'update'])->middleware('auth:api');
+        route::patch("/",  [ProfilesController::class, "update"])->middleware("auth:api");
     }
 );
